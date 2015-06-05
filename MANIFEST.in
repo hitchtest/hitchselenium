@@ -1,0 +1,1 @@
+recursive-include hitchselenium *.py *.jinja2 *.xpi
