@@ -1,27 +1,30 @@
+from hitchselenium.profile import Profile
 from selenium import webdriver
-from profile import Profile
-import os
+from sys import stdout
 import json
-import sys
 import time
 
 
+def stop():
+    driver.quit()
+    stdout.write("Firefox closed\n")
+    stdout.flush()
+
 def run():
     driver = webdriver.Firefox(firefox_profile=Profile())
-    #driver = webdriver.PhantomJS()
-    sys.stdout.write("READY\n")
-    sys.stdout.flush()
+    stdout.write("READY\n")
+    stdout.flush()
     config = {"uri": "http://127.0.0.1:{}/hub".format(driver.profile.port), }
-    sys.stdout.write("{}\n".format(json.dumps(config)))
-    sys.stdout.flush()
+    stdout.write("{}\n".format(json.dumps(config)))
+    stdout.flush()
 
     try:
         while True:
             time.sleep(1)
-    except (KeyboardInterrupt, SystemExit):
-        driver.quit()
-        sys.stdout.write("Firefox closed\n")
-        sys.stdout.flush()
+    except KeyboardInterrupt:
+        stop()
+    except SystemExit:
+        stop()
 
 if __name__=='__main__':
     run()

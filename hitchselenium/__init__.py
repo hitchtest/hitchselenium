@@ -1,3 +1,3 @@
-from server import run
-from profile import Profile
-from selenium_service import SeleniumService
+from hitchselenium.selenium_service import SeleniumService
+from hitchselenium.profile import Profile
+from hitchselenium.server import run
