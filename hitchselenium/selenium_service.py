@@ -5,6 +5,7 @@ import os
 
 
 class SeleniumService(Service):
+    """Firefox with selenium as a service."""
 
     def __init__(self, xvfb=False, shunt_window=True, **kwargs):
         kwargs['log_line_ready_checker'] = lambda line: "READY" in line
@@ -16,6 +17,7 @@ class SeleniumService(Service):
 
     @property
     def driver(self):
+        """Get selenium driver object."""
         if self._driver is not None:
             return self._driver
         else:
