@@ -7,11 +7,19 @@ import os
 class SeleniumService(Service):
     """Firefox with selenium as a service."""
 
-    def __init__(self, xvfb=False, shunt_window=True, **kwargs):
+    def __init__(self, xvfb=False, shunt_window=True, implicitly_wait=5.0, **kwargs):
+        """Initialize selenium Service object (but don't run).
+
+        Args:
+            xvfb (Optional[bool]): Run service with X virtual framebuffer (don't show firefox window).
+            shunt_window (Optional[bool]): Shunt window to (0, 0) coordinates to move out of the way of the mouse.
+            implicitly_wait (Optional[float]): Set implicitly_wait value of the selenium driver. Default: 5.0 seconds.
+        """
         kwargs['log_line_ready_checker'] = lambda line: "READY" in line
         xvfb_run = ['xvfb-run'] if xvfb else []
         kwargs['command'] = xvfb_run + [sys.executable, "-u", "-m", "hitchselenium.server"]
         self.shunt_window = shunt_window
+        self.implicitly_wait = implicitly_wait
         self._driver = None
         super(SeleniumService, self).__init__(**kwargs)
 
