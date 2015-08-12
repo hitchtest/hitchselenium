@@ -18,6 +18,7 @@ class SeleniumService(Service):
         kwargs['log_line_ready_checker'] = lambda line: "READY" in line
         xvfb_run = ['xvfb-run'] if xvfb else []
         kwargs['command'] = xvfb_run + [sys.executable, "-u", "-m", "hitchselenium.server"]
+        kwargs['no_libfaketime'] = True
         self.shunt_window = shunt_window
         self.implicitly_wait = implicitly_wait
         self._driver = None
