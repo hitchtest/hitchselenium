@@ -1,8 +1,9 @@
 from hitchselenium.profile import Profile
 from selenium import webdriver
-from sys import stdout
+from sys import stdout, stderr
 import json
 import time
+import os
 
 
 def stop(driver):
@@ -11,6 +12,13 @@ def stop(driver):
     stdout.flush()
 
 def run():
+    if "DISPLAY" not in os.environ:
+        stderr.write(
+            "The DISPLAY environment variable is not set.\n"
+            "This usually means that X is not available.\n"
+            "Information on how to fix this problem can be found here:\n"
+            "https://stackoverflow.com/questions/784404/how-can-i-specify-a-display\n"
+        )
     driver = webdriver.Firefox(firefox_profile=Profile())
     stdout.write("READY\n")
     stdout.flush()

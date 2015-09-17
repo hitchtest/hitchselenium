@@ -1,7 +1,7 @@
+from hitchtest.environment import checks
 from hitchserve import Service
 from selenium import webdriver
 import sys
-import os
 
 
 class SeleniumService(Service):
@@ -15,6 +15,14 @@ class SeleniumService(Service):
             shunt_window (Optional[bool]): Shunt window to (0, 0) coordinates to move out of the way of the mouse.
             implicitly_wait (Optional[float]): Set implicitly_wait value of the selenium driver. Default: 5.0 seconds.
         """
+
+        checks.packages([
+            "firefox", "xvfb", "xauth", "xserver-xorg", "dbus-x11", "ca-certificates"
+        ])
+
+        if not xvfb:
+            checks.x_available(True)
+
         kwargs['log_line_ready_checker'] = lambda line: "READY" in line
         xvfb_run = ['xvfb-run'] if xvfb else []
         kwargs['command'] = xvfb_run + [sys.executable, "-u", "-m", "hitchselenium.server"]
