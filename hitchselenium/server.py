@@ -21,10 +21,10 @@ def run():
             "https://stackoverflow.com/questions/784404/how-can-i-specify-a-display\n"
         )
     driver = webdriver.Firefox(firefox_profile=Profile())
-    stdout.write("READY\n")
-    stdout.flush()
     config = {"uri": "http://127.0.0.1:{}/hub".format(driver.profile.port), }
     stdout.write("{}\n".format(json.dumps(config)))
+    stdout.flush()
+    stdout.write("READY\n")
     stdout.flush()
 
     try:
