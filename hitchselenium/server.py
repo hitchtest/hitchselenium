@@ -3,6 +3,7 @@ from selenium import webdriver
 from sys import stdout, stderr
 import json
 import time
+import sys
 import os
 
 
@@ -12,7 +13,7 @@ def stop(driver):
     stdout.flush()
 
 def run():
-    if "DISPLAY" not in os.environ:
+    if "DISPLAY" not in os.environ and sys.platform != "darwin":
         stderr.write(
             "The DISPLAY environment variable is not set.\n"
             "This usually means that X is not available.\n"

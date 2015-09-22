@@ -21,7 +21,8 @@ class SeleniumService(Service):
         ])
 
         if not xvfb:
-            checks.x_available(True)
+            if sys.platform != "darwin":
+                checks.x_available(True)
 
         kwargs['log_line_ready_checker'] = lambda line: "READY" in line
         xvfb_run = ['xvfb-run'] if xvfb else []
