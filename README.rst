@@ -2,7 +2,7 @@ HitchSelenium
 =============
 
 HitchSelenium is a plugin for the Hitch testing framework that wraps selenium and
-starts firefox, optionally with XVFB.
+starts firefox, optionally with XVFB so the browser window does not appear.
 
 Use with Hitch
 ==============
@@ -32,18 +32,15 @@ See this service in action at the DjangoRemindMe_ project.
 Features
 ========
 
-* Starts up the browser on a separate thread when running with HitchServe_, in parallel with other services, so that your integration tests run faster.
+* Starts up the browser on a separate thread when running with HitchServe_, in parallel with starting other services, so that your integration tests run faster.
 * You can optionally run the Firefox browser visibly and invisibly using XVFB.
-* Comes pre-installed with Selenium IDE firefox plugin so you can record clicks and generate python code to copy and paste during a paused test.
-
 
 Caveats
 =======
 
 * Currently only supports firefox.
 * Might not necessarily work with the latest version of firefox.
-* Does not correctly pick up the faked time from libfaketime; reports system time instead.
-* Selenium IDE does not work under all circumstances. Seems to fail on Mac OS.
+* Faketime is not enabled since firefox does not respond well to it. Javascript will always return system time.
 
 
 .. _HitchServe: https://github.com/hitchtest/hitchserve
