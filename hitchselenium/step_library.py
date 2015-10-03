@@ -44,7 +44,7 @@ class HitchSeleniumItem(object):
             elif number_from_begin == "":
                 raise BadItemDescription(begin, item)
             else:
-                self._index = int(number_from_begin)
+                self._index = int(number_from_begin) - 1
 
     @property
     def index(self):
@@ -116,7 +116,7 @@ class SeleniumStepLibrary(object):
                         class_name
                     ) for class_name in item.html_classes]
                 ),
-                str(item.index)
+                str(item.index + 1) if item.index >= 0 else "last()"
             )
 
             WebDriverWait(self.driver, self.wait_for_timeout).until(
@@ -129,9 +129,17 @@ class SeleniumStepLibrary(object):
         """Wait for any of the items to contain text.
 
            Where items is a space separated list of HTML classes."""
+        full_xpath = """//*[{}][{}]""".format(
+            " and ".join([
+                """contains(concat(' ', normalize-space(@class), ' '), ' {} ')""".format(
+                    class_name
+                ) for class_name in items.split(" ")]
+            ),
+            "text()='{}'".format(text)
+        )
         WebDriverWait(self.driver, self.wait_for_timeout).until(
-            EC.text_to_be_present_in_element(
-                (By.CSS_SELECTOR, "." + items.replace(" ", ".")), text
+            EC.presence_of_element_located(
+                (By.XPATH, full_xpath)
             )
         )
 
@@ -147,8 +155,14 @@ class SeleniumStepLibrary(object):
         if item.is_id:
             self.driver.execute_script("document.getElementById('{}').click();".format(item.html_id))
         else:
-            self.driver.execute_script(
-                "document.getElementsByClassName('{}')[{}].click();".format(
-                    " ".join(item.html_classes), item.index
+            if item.index >= 0:
+                self.driver.execute_script(
+                    "document.getElementsByClassName('{}')[{}].click();".format(
+                        " ".join(item.html_classes), item.index
+                    )
                 )
-            )
+            else:
+                self.driver.execute_script((
+                    "collection=document.getElementsByClassName('{}'); "
+                    "collection[collection.length-1].click();"
+                ).format(" ".join(item.html_classes)))
