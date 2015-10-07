@@ -26,7 +26,7 @@ def read(*parts):
     return codecs.open(os.path.join(os.path.abspath(os.path.dirname(__file__)), *parts), 'r').read()
 
 setup(name="hitchselenium",
-      version="0.4.5",
+      version="0.4.6",
       description="Plugin to run Selenium with firefox using the Hitch testing framework.",
       long_description=read('README.rst'),
       classifiers=[
