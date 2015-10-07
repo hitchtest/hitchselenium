@@ -7,6 +7,19 @@ import codecs
 import sys
 import os
 
+
+class CustomInstall(install):
+    def run(self):
+        try:
+            import unixpackage
+            unixpackage.install([
+                "firefox", "xvfb", "xauth", "xserver-xorg", "dbus-x11", "ca-certificates",
+            ], polite=True)
+        except ImportError:
+            sys.stderr.write("WARNING : unixpackage unavailable; cannot check for system dependencies.")
+            sys.stderr.flush()
+        install.run(self)
+
 def read(*parts):
     # intentionally *not* adding an encoding option to open
     # see here: https://github.com/pypa/virtualenv/issues/201#issuecomment-3145690
@@ -42,4 +55,5 @@ setup(name="hitchselenium",
       package_data={},
       zip_safe=False,
       include_package_data=True,
+      cmdclass={'install': CustomInstall},
 )
