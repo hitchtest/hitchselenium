@@ -20,7 +20,11 @@ class SeleniumService(Service):
             "firefox", "xvfb", "xauth", "xserver-xorg", "dbus-x11", "ca-certificates"
         ])
 
-        if not xvfb:
+        if xvfb:
+            if sys.platform == "darwin":
+                raise RuntimeError("Hitch can't use xvfb on Mac OS X")
+        else:
+            # If it's Linux and we're not using xvfb, we need X available
             if sys.platform != "darwin":
                 checks.x_available(True)
 
