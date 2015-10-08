@@ -1,6 +1,7 @@
 from hitchtest.environment import checks
 from hitchserve import Service
 from selenium import webdriver
+import hitchselenium
 import sys
 
 
@@ -16,9 +17,7 @@ class SeleniumService(Service):
             implicitly_wait (Optional[float]): Set implicitly_wait value of the selenium driver. Default: 5.0 seconds.
         """
 
-        checks.packages([
-            "firefox", "xvfb", "xauth", "xserver-xorg", "dbus-x11", "ca-certificates"
-        ])
+        checks.packages(hitchselenium.UNIXPACKAGES)
 
         if xvfb:
             if sys.platform == "darwin":
