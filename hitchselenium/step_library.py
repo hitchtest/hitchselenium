@@ -95,14 +95,40 @@ class SeleniumStepLibrary(object):
                 "." + ".".join(item.html_classes)
             )[item.index].click()
 
+    def wait_to_appear(self, item):
+        """Wait for item to appear
+
+           * If there are no spaces in item, waits for element with HTML id "item" to appear.
+           * "first class1" - waits for first item with  HTML class "class1" to appear.
+           * "2nd class1 class2" - waits for the 2nd item with HTML classes class1 and class2 to appear.
+           * "last class1 class2" - waits for the last element with classes class1 and class2 to appear.
+        """
+        item = HitchSeleniumItem(item)
+        if item.is_id:
+            WebDriverWait(self.driver, self.wait_for_timeout).until(
+                EC.visibility_of_element_located((By.ID, item.html_id))
+            )
+        else:
+            full_xpath = """//*[{}][{}]""".format(
+                " and ".join([
+                    """contains(concat(' ', normalize-space(@class), ' '), ' {} ')""".format(
+                        class_name
+                    ) for class_name in item.html_classes]
+                ),
+                str(item.index + 1) if item.index >= 0 else "last()"
+            )
+
+            WebDriverWait(self.driver, self.wait_for_timeout).until(
+                EC.visibility_of_element_located((By.XPATH, full_xpath))
+            )
 
     def wait_to_contain(self, item=None, text=None):
         """Wait for item to contain text
 
-           * If there are no spaces in item, waits for element with HTML id "item".
+           * If there are no spaces in item, waits for element with HTML id "item" to contain 'text'
            * "first class1" - waits for first item with  HTML class "class1" to contain text.
-           * "2nd class1 class2" - clicks on the second element with HTML classes class1 and class2.
-           * "last class1 class2" - clicks on the last element with classes class1 and class2
+           * "2nd class1 class2" - waits for the 2nd item with HTML classes class1 and class2 to contain 'text'.
+           * "last class1 class2" - waits for the last element with classes class1 and class2 to contain 'text'.
         """
         item = HitchSeleniumItem(item)
         if item.is_id:
