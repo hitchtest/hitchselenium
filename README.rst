@@ -42,6 +42,11 @@ Caveats
 * Might not necessarily work with the latest version of firefox.
 * Faketime is not enabled since firefox does not respond well to it. Javascript will always return system time.
 
+TODO
+====
+
+Download and install specified versions of firefox/chromium in .hitchpkg directory for all versions.
+
 
 .. _HitchServe: https://github.com/hitchtest/hitchserve
 .. _DjangoRemindMe: https://github.com/hitchtest/django-remindme
