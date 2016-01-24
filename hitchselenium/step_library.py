@@ -2,8 +2,10 @@ import selenium.webdriver.support.expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.by import By
 from selenium.common.exceptions import TimeoutException
+from os.path import join, abspath, exists
 import selenium
 import re
+import os
 
 
 class HitchSeleniumException(Exception):
@@ -15,6 +17,13 @@ class BadItemDescription(HitchSeleniumException):
         super(BadItemDescription, self).__init__((
             "'{}' in '{}' should be either first, 2nd, 3rd, 4th, etc. or last"
         ).format(begin, item))
+
+
+class HitchUploadFileNotFound(HitchSeleniumException):
+    def __init__(self, path):
+        super(HitchUploadFileNotFound, self).__init__((
+            "'{}' not found. Check upload_directory in the SeleniumStepLibrary is correct?"
+        ).format(path))
 
 
 class HitchSeleniumItem(object):
@@ -70,7 +79,7 @@ class HitchSeleniumItem(object):
 class SeleniumStepLibrary(object):
     """A package of steps which can be used to test command line applications."""
 
-    def __init__(self, selenium_webdriver, wait_for_timeout=5):
+    def __init__(self, selenium_webdriver, wait_for_timeout=5, upload_directory=os.getcwd()):
         """Create a library of steps using a selenium webdriver.
 
            selenium_webdriver - webdriver object.
@@ -78,6 +87,7 @@ class SeleniumStepLibrary(object):
         """
         self.driver = selenium_webdriver
         self.wait_for_timeout = wait_for_timeout
+        self.upload_directory = upload_directory
 
     def click(self, item):
         """Click on item.
@@ -94,6 +104,46 @@ class SeleniumStepLibrary(object):
             self.driver.find_elements_by_css_selector(
                 "." + ".".join(item.html_classes)
             )[item.index].click()
+
+
+    def enter_text(self, item=None, text=None):
+        """Enter text.
+
+           * If there are no spaces, clicks on element with HTML id "item".
+           * "first class1" - clicks on first element with the HTML class "class1"
+           * "2nd class1 class2" - clicks on the second element with HTML classes class1 and class2.
+           * "last class1 class2" - clicks on the last element with classes class1 and class2
+        """
+        item = HitchSeleniumItem(item)
+        if item.is_id:
+            self.driver.find_element_by_id(item.html_id).click()
+        else:
+            self.driver.find_elements_by_css_selector(
+                "." + ".".join(item.html_classes)
+            )[item.index].click()
+
+
+    def upload_file(self, item=None, path=None):
+        """Upload file name relative to upload_directory set in constructor.
+
+           * If there are no spaces, clicks on element with HTML id "item".
+           * "first class1" - clicks on first element with the HTML class "class1"
+           * "2nd class1 class2" - clicks on the second element with HTML classes class1 and class2.
+           * "last class1 class2" - clicks on the last element with classes class1 and class2
+        """
+        full_path = abspath(join(self.upload_directory, path))
+
+        if not exists(full_path):
+            raise HitchUploadFileNotFound(full_path)
+        
+        item = HitchSeleniumItem(item)
+        if item.is_id:
+            self.driver.find_element_by_id(item.html_id).send_keys(full_path)
+        else:
+            self.driver.find_elements_by_css_selector(
+                "." + ".".join(item.html_classes)
+            )[item.index].send_keys(full_path)
+
 
     def wait_to_appear(self, item):
         """Wait for item to appear
