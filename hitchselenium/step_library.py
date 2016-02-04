@@ -107,7 +107,7 @@ class SeleniumStepLibrary(object):
 
 
     def enter_text(self, item=None, text=None):
-        """Enter text.
+        """Enter text to a specified element.
 
            * If there are no spaces, clicks on element with HTML id "item".
            * "first class1" - clicks on first element with the HTML class "class1"
@@ -116,11 +116,13 @@ class SeleniumStepLibrary(object):
         """
         item = HitchSeleniumItem(item)
         if item.is_id:
-            self.driver.find_element_by_id(item.html_id).click()
+            element = self.driver.find_element_by_id(item.html_id)
         else:
-            self.driver.find_elements_by_css_selector(
+            element = self.driver.find_elements_by_css_selector(
                 "." + ".".join(item.html_classes)
-            )[item.index].click()
+            )[item.index]
+        element.clear()
+        element.send_keys(text)
 
 
     def upload_file(self, item=None, path=None):
@@ -172,8 +174,32 @@ class SeleniumStepLibrary(object):
                 EC.visibility_of_element_located((By.XPATH, full_xpath))
             )
 
+        
+    def wait_for_form_item_to_contain(self, item=None, text=None):
+        item = HitchSeleniumItem(item)
+        if item.is_id:
+            WebDriverWait(self.driver, self.wait_for_timeout).until(
+                EC.text_to_be_present_in_element_value((By.ID, item.html_id), text)
+            )
+        else:
+            full_xpath = """//*[{}][{}]""".format(
+                " and ".join([
+                    """contains(concat(' ', normalize-space(@class), ' '), ' {} ')""".format(
+                        class_name
+                    ) for class_name in item.html_classes]
+                ),
+                str(item.index + 1) if item.index >= 0 else "last()"
+            )
+
+            WebDriverWait(self.driver, self.wait_for_timeout).until(
+                EC.text_to_be_present_in_element_value(
+                    (By.XPATH, full_xpath), text
+                )
+            )
+
+
     def wait_to_contain(self, item=None, text=None):
-        """Wait for item to contain text
+        """Wait for item like a label to contain text.
 
            * If there are no spaces in item, waits for element with HTML id "item" to contain 'text'
            * "first class1" - waits for first item with  HTML class "class1" to contain text.
@@ -202,7 +228,7 @@ class SeleniumStepLibrary(object):
             )
 
     def wait_for_any_to_contain(self, items=None, text=None):
-        """Wait for any of the items to contain text.
+        """Wait for any of the non-form items to contain text.
 
            Where items is a space separated list of HTML classes."""
         full_xpath = """//*[{}][{}]""".format(
