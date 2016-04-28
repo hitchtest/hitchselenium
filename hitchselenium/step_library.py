@@ -174,7 +174,30 @@ class SeleniumStepLibrary(object):
                 EC.visibility_of_element_located((By.XPATH, full_xpath))
             )
 
-        
+    def should_not_appear(self, item):
+        """Wait and make sure an item does NOT appear.
+
+           Note that this makes use of 'wait_to_appear', and so if the item
+           in question takes longer to appear than wait_to_appear takes to
+           time out then it will be considered not to have appeared.
+
+           * If there are no spaces in item, waits for element with HTML id
+             "item" to appear.
+           * "first class1" - waits for first item with  HTML class "class1"
+             to appear.
+           * "2nd class1 class2" - waits for the 2nd item with HTML classes
+             class1 and class2 to appear.
+           * "last class1 class2" - waits for the last element with classes
+             class1 and class2 to appear.
+        """
+        try:
+            self.wait_to_appear(item)
+            raise RuntimeError(
+                "Item {} should not have appeared".format(item)
+            )
+        except TimeoutException:
+            pass
+
     def wait_for_form_item_to_contain(self, item=None, text=None):
         item = HitchSeleniumItem(item)
         if item.is_id:
