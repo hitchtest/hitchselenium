@@ -8,7 +8,7 @@ import sys
 class SeleniumService(Service):
     """Firefox with selenium as a service."""
 
-    def __init__(self, xvfb=False, shunt_window=True, implicitly_wait=5.0, **kwargs):
+    def __init__(self, xvfb=False, shunt_window=True, implicitly_wait=5.0, firefox_binary="firefox", **kwargs):
         """Initialize selenium Service object (but don't run).
 
         Args:
@@ -29,7 +29,7 @@ class SeleniumService(Service):
 
         kwargs['log_line_ready_checker'] = lambda line: "READY" in line
         xvfb_run = ['xvfb-run'] if xvfb else []
-        kwargs['command'] = xvfb_run + [sys.executable, "-u", "-m", "hitchselenium.server"]
+        kwargs['command'] = xvfb_run + [sys.executable, "-u", "-m", "hitchselenium.server", str(firefox_binary)]
         kwargs['no_libfaketime'] = True
         self.shunt_window = shunt_window
         self.implicitly_wait = implicitly_wait

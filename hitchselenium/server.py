@@ -1,3 +1,4 @@
+from selenium.webdriver.firefox.firefox_binary import FirefoxBinary
 from hitchselenium.profile import Profile
 from selenium import webdriver
 from sys import stdout, stderr
@@ -20,7 +21,10 @@ def run():
             "Information on how to fix this problem can be found here:\n"
             "https://stackoverflow.com/questions/784404/how-can-i-specify-a-display\n"
         )
-    driver = webdriver.Firefox(firefox_profile=Profile())
+    driver = webdriver.Firefox(
+        firefox_profile=Profile(),
+        firefox_binary=FirefoxBinary(firefox_path=sys.argv[1])
+    )
     config = {"uri": "http://127.0.0.1:{}/hub".format(driver.profile.port), }
     stdout.write("{}\n".format(json.dumps(config)))
     stdout.flush()
