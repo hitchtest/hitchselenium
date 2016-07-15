@@ -6,5 +6,5 @@ from hitchselenium.server import run
 
 
 UNIXPACKAGES = [
-    "firefox", "xvfb", "xauth", "xserver-xorg", "dbus-x11", "ca-certificates",
+    "xvfb", "xauth", "xserver-xorg", "dbus-x11", "ca-certificates",
 ]

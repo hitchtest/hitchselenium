@@ -1,15 +1,17 @@
 from hitchtest import HitchPackage, utils
+from hitchtest.executionengine import Paths
 from hitchtest.environment import checks
 from subprocess import check_output, call, check_call
 from os.path import join, exists
 from os import makedirs, chdir, environ
-from selenium.webdriver.firefox.firefox_binary import FirefoxBinary
 import hitchselenium
 import struct
 import sys
 
 
 ISSUES_URL = "http://github.com/hitchtest/hitchselenium/issues"
+
+RELEASE_URL_BASE = "https://download-installer.cdn.mozilla.net/pub/firefox/releases/"
 
 class FirefoxPackage(HitchPackage):
     VERSIONS = [
@@ -18,26 +20,19 @@ class FirefoxPackage(HitchPackage):
 
     name = "Firefox"
 
-    def __init__(self, version="46.0.1", directory=None, bin_directory=None):
+    def __init__(self, version="46.0.1", paths=None, directory=None):
         super(FirefoxPackage, self).__init__()
         self.version = self.check_version(version, self.VERSIONS, ISSUES_URL)
-        self.subdirectory = "firefox"
-
-        if directory is None:
-            if sys.platform == "darwin":
-                self.download_url = "https://download-installer.cdn.mozilla.net/pub/firefox/releases/{0}/mac/en-US/Firefox%20{0}.dmg".format(self.version)
-            else:
-                systembits = struct.calcsize("P") * 8
-
-                if systembits == 32:
-                    self.download_url = "https://download-installer.cdn.mozilla.net/pub/firefox/releases/{0}/linux-i686/en-US/firefox-{0}.tar.bz2".format(self.version)
-                else:
-                    self.download_url = "https://download-installer.cdn.mozilla.net/pub/firefox/releases/{0}/linux-x86_64/en-US/firefox-{0}.tar.bz2".format(self.version)
-            self.directory = join(self.get_build_directory(), "firefox-{}".format(self.version), "firefox")
+        if paths is None:
+            paths = Paths()
+            self._firefox_path = join(self.get_downloads_directory(), "firefox-{}".format(version))
         else:
-            self.directory = directory
+            self._firefox_path = paths.hitchpkg.joinpath(
+                package.format(version=self.version)
+            ).abspath()
 
-        #checks.packages(hitchselenium.UNIXPACKAGES)
+        self.directory = self._firefox_path
+
 
     def verify(self):
         version_output = check_output([self.firefox, "--version"]).decode('utf8')
@@ -46,16 +41,33 @@ class FirefoxPackage(HitchPackage):
 
     def build(self):
         download_to = join(self.get_downloads_directory(), "firefox-{}.tar.gz".format(self.version))
+        if sys.platform == "darwin":
+            self.download_url = "{0}{1}/mac/en-US/Firefox%20{1}.dmg".format(RELEASE_URL_BASE, self.version)
+        else:
+            systembits = struct.calcsize("P") * 8
+
+            if systembits == 32:
+                self.download_url = "{0}{1}/linux-i686/en-US/firefox-{1}.tar.bz2".format(RELEASE_URL_BASE, self.version)
+            else:
+                self.download_url = "{0}{1}/linux-x86_64/en-US/firefox-{1}.tar.bz2".format(RELEASE_URL_BASE, self.version)
         utils.download_file(download_to, self.download_url)
 
-        if not exists(self.directory):
-            makedirs(self.directory)
-            utils.extract_archive(download_to, self.directory)
-        self.bin_directory = join(self.directory, "firefox")
+        if sys.platform == "darwin":
+            if not exists(self.directory):
+                check_call(["hdiutil", "attach", "-nobrowse", "-mountpoint", self.directory, download_to])
+            self.bin_directory = join(self.directory, "Firefox.app", "Contents", "MacOS")
+        else:
+            if not exists(self.directory):
+                makedirs(self.directory)
+                utils.extract_archive(download_to, self.directory)
+            self.bin_directory = join(self.directory, "firefox")
         self.verify()
 
     @property
     def firefox(self):
         if self.bin_directory is None:
             raise RuntimeError("bin_directory not set.")
-        return join(self.bin_directory, "firefox")
+        if sys.platform == "darwin":
+            return join(self.bin_directory, "firefox-bin")
+        else:
+            return join(self.bin_directory, "firefox")
