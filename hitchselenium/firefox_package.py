@@ -5,6 +5,7 @@ from subprocess import check_output, call, check_call
 from os.path import join, exists
 from os import makedirs, chdir, environ
 import hitchselenium
+import shutil
 import struct
 import sys
 
@@ -32,6 +33,7 @@ class FirefoxPackage(HitchPackage):
             ).abspath()
 
         self.directory = self._firefox_path
+        self.tmp_directory = '/tmp/firefoxmount'
 
 
     def verify(self):
@@ -40,10 +42,11 @@ class FirefoxPackage(HitchPackage):
             raise RuntimeError("Firefox version needed is {}, output is: {}.".format(self.version, version_output))
 
     def build(self):
-        download_to = join(self.get_downloads_directory(), "firefox-{}.tar.gz".format(self.version))
         if sys.platform == "darwin":
+            download_to = join(self.get_downloads_directory(), "firefox-{}.dmg".format(self.version))
             self.download_url = "{0}{1}/mac/en-US/Firefox%20{1}.dmg".format(RELEASE_URL_BASE, self.version)
         else:
+            download_to = join(self.get_downloads_directory(), "firefox-{}.tar.gz".format(self.version))
             systembits = struct.calcsize("P") * 8
 
             if systembits == 32:
@@ -54,7 +57,10 @@ class FirefoxPackage(HitchPackage):
 
         if sys.platform == "darwin":
             if not exists(self.directory):
-                check_call(["hdiutil", "attach", "-nobrowse", "-mountpoint", self.directory, download_to])
+                check_call(["hdiutil", "attach", "-nobrowse", "-mountpoint", self.tmp_directory, download_to])
+                makedirs(join(self.directory, "Firefox.app"))
+                shutil.copytree(join(self.tmp_directory, "Firefox.app", "Contents"), join(self.directory, "Firefox.app", "Contents"))
+                check_call(["hdiutil", "detach", self.tmp_directory])
             self.bin_directory = join(self.directory, "Firefox.app", "Contents", "MacOS")
         else:
             if not exists(self.directory):
