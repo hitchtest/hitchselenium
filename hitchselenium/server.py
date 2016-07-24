@@ -21,9 +21,15 @@ def run():
             "Information on how to fix this problem can be found here:\n"
             "https://stackoverflow.com/questions/784404/how-can-i-specify-a-display\n"
         )
+    
+    profile = Profile()
+
+    for preference in json.loads(sys.argv[2]):
+        profile.set_preference(list(preference.keys())[0], list(preference.values())[0])
+    
     driver = webdriver.Firefox(
-        firefox_profile=Profile(),
-        firefox_binary=FirefoxBinary(firefox_path=sys.argv[1])
+        firefox_profile=profile,
+        firefox_binary=FirefoxBinary(firefox_path=sys.argv[1], log_file=sys.stdout)
     )
     config = {"uri": "http://127.0.0.1:{}/hub".format(driver.profile.port), }
     stdout.write("{}\n".format(json.dumps(config)))

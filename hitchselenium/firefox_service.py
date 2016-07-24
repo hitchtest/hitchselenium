@@ -6,10 +6,10 @@ import json
 import sys
 
 
-class SeleniumService(Service):
+class FirefoxService(Service):
     """Firefox with selenium as a service."""
 
-    def __init__(self, xvfb=False, shunt_window=True, implicitly_wait=5.0, firefox_binary="firefox", **kwargs):
+    def __init__(self, firefox_binary, xvfb=False, shunt_window=True, implicitly_wait=5.0, preferences=None, **kwargs):
         """Initialize selenium Service object (but don't run).
 
         Args:
@@ -30,12 +30,18 @@ class SeleniumService(Service):
 
         kwargs['log_line_ready_checker'] = lambda line: "READY" in line
         xvfb_run = ['xvfb-run'] if xvfb else []
-        kwargs['command'] = xvfb_run + [sys.executable, "-u", "-m", "hitchselenium.server", str(firefox_binary), json.dumps([])]
+        kwargs['command'] = xvfb_run + [
+            sys.executable,
+            "-u",
+            "-m", "hitchselenium.server",
+            str(firefox_binary),
+            json.dumps(preferences) if preferences else json.dumps([])
+        ]
         kwargs['no_libfaketime'] = True
         self.shunt_window = shunt_window
         self.implicitly_wait = implicitly_wait
         self._driver = None
-        super(SeleniumService, self).__init__(**kwargs)
+        super(FirefoxService, self).__init__(**kwargs)
 
     @property
     def driver(self):
@@ -59,4 +65,4 @@ class SeleniumService(Service):
         if sys.platform == "darwin":
             return {}
         else:
-            return super(SeleniumService, self).env_vars
+            return super(FirefoxService, self).env_vars
