@@ -9,4 +9,4 @@ class Profile(webdriver.FirefoxProfile):
         self.set_preference("startup.homepage_welcome_url.additional", "about:blank")
         self.set_preference("browser.shell.checkDefaultBrowser", False)
         self.set_preference("devtools.webconsole.persistlog", True)
-        self.set_preference("app.update.enabled", True)
+        self.set_preference("app.update.enabled", False)
