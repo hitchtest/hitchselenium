@@ -3,7 +3,7 @@ from hitchselenium.selenium_service import SeleniumService
 from hitchselenium.firefox_service import FirefoxService
 from hitchselenium.firefox_package import FirefoxPackage
 from hitchselenium.profile import Profile
-from hitchselenium.server import run
+from hitchselenium.server import runserver
 
 
 UNIXPACKAGES = [
