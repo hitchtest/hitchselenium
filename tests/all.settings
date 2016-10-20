@@ -1,1 +1,21 @@
 python_version: 3.5.0
+
+html_base: |
+  <html>
+  <head>
+  <title>Tester</title>
+  </head>
+  <body>
+  {core}
+  </body>
+  </html>
+
+success_html: |
+  <html>
+  <head>
+  <title>Tester</title>
+  </head>
+  <body>
+  <h1 id="success-message">Success!</h1>
+  </body>
+  </html>

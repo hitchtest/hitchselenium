@@ -5,6 +5,8 @@ from hitchselenium.firefox_package import FirefoxPackage
 from hitchselenium.profile import Profile
 from hitchselenium.server import runserver
 
+from hitchselenium.director import Director
+from hitchselenium.selector import ReadableSelectorTranslator
 
 UNIXPACKAGES = [
     "xvfb", "xauth", "xserver-xorg", "dbus-x11", "ca-certificates",
