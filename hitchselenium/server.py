@@ -13,7 +13,7 @@ def stop(driver):
     stdout.write("Firefox closed\n")
     stdout.flush()
 
-def run():
+def runserver():
     if "DISPLAY" not in os.environ and sys.platform != "darwin":
         stderr.write(
             "The DISPLAY environment variable is not set.\n"
@@ -46,4 +46,4 @@ def run():
         stop(driver)
 
 if __name__=='__main__':
-    run()
+    runserver()
