@@ -4,3 +4,7 @@ class HitchSeleniumException(Exception):
 
 class SingleElementSelectorMatchedMoreElements(HitchSeleniumException):
     pass
+
+
+class SingleElementSelectorMatchedNoElements(HitchSeleniumException):
+    pass

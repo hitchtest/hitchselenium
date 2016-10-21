@@ -16,7 +16,14 @@ class CSSSelector(object):
                     self._code,
                 )
             )
-        return results
+        elif len(results) == 0:
+            raise exceptions.SingleElementSelectorMatchedNoElements(
+                """No element found matching CSS selector '{}'""".format(
+                    self._code,
+                )
+            )
+        else:
+            return results
 
     def conditions(self):
         return (By.CSS_SELECTOR, self._code)
