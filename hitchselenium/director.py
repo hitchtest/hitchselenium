@@ -24,6 +24,12 @@ class IndividualElementDirector(object):
         self.selector.find_element(self.director.driver).clear()
         self.selector.find_element(self.director.driver).send_keys(text)
 
+    def send_keys(self, text):
+        """
+        Fill text in a text box.
+        """
+        self.selector.find_element(self.director.driver).send_keys(text)
+
     def click(self):
         self.selector.find_element(self.director.driver).click()
 

@@ -1,0 +1,43 @@
+- name : Drop down
+  description: |
+    Pick an item from a drop down.
+  preconditions:
+    html: |
+      <form method="get" action="/success.html">
+        <select name="favorite-animal" id="favorite-animal">
+          <option id="id_dog" value="dog">Dog</a>
+          <option id="id_cow" value="cow">Cow</a>
+          <option id="id_bunny" value="bunny">Bunny</a>
+        </select>
+        <input type="submit" />
+      </form>
+    driver: yes
+    selectors: |
+      dog: '#id_dog'
+      bunny: '#id_bunny'
+      cow: '#id_cow'
+      submit:
+        xpath: //input[@type='submit']
+  scenario:
+    - Example code: |
+        from hitchselenium import Director, ReadableSelectorTranslator
+
+        translator = ReadableSelectorTranslator(override_selectors="selectors.yaml")
+        director = Director(driver, translator)
+        director.visit("http://localhost:8000")
+        director.the("favorite animal").click()
+        director.the("bunny").click()
+        director.the("favorite animal").click()
+        director.the("submit").click()
+        director.the("success message").should_appear()
+        director.url.should_contain("bunny")
+
+    - Example code: |
+        # Select drop down by typing
+        director.visit("http://localhost:8000")
+        director.the("favorite animal").send_keys("c")
+        director.the("submit").click()
+        director.url.should_contain("cow")
+  tags:
+    - selector
+    - fill-form
