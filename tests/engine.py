@@ -150,12 +150,41 @@ class ExecutionEngine(hitchtest.ExecutionEngine):
         if hasattr(self, 'services') and self.services is not None:
             self.services.stop_interactive_mode()
 
+    def shell(self):
+        if hasattr(self, 'services'):
+            self.services.start_interactive_mode()
+            import sys
+            import time ; time.sleep(0.5)
+            from os import path
+            from subprocess import call
+            if path.exists(path.join(
+                path.expanduser("~"), ".ipython/profile_default/security/",
+                self.ipython_kernel_filename)
+            ):
+                call([
+                        sys.executable, "-m", "IPython", "console",
+                        "--existing",
+                        path.join(
+                            path.expanduser("~"),
+                            ".ipython/profile_default/security/",
+                            self.ipython_kernel_filename
+                        )
+                    ])
+            else:
+                call([
+                    sys.executable, "-m", "IPython", "console",
+                    "--existing", self.ipython_kernel_filename
+                ])
+            self.services.stop_interactive_mode()
+
     def on_failure(self):
         """Stop and IPython."""
         if self.settings.get("kaching", False):
             kaching.fail()
-        if self.settings.get("pause_on_failure", False):
-            self.pause(message=self.stacktrace.to_template())
+        if self.settings.get("pause_on_failure", True):
+            self.services.log(message=self.stacktrace.to_template())
+            self.shell()
+
 
     def on_success(self):
         """Ka-ching!"""
