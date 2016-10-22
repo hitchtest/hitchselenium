@@ -1,4 +1,3 @@
-* Fill form
 * Drop downs
 * Browser back/forward button
 * Hit key

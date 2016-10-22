@@ -1,0 +1,31 @@
+- name : Fill form
+  description: |
+    Fill in a basic form, click submit and check that URL contains details.
+  preconditions:
+    html: |
+      <form method="get" action="/success.html">
+        <input name="first-name" id="first-name" />
+        <input name="last-name" id="last-name" />
+        <input type="submit" />
+      </form>
+    driver: yes
+    selectors: |
+      first name: '#first-name'
+      last name: '#last-name'
+      submit:
+        xpath: //input[@type='submit']
+  scenario:
+    - Example code: |
+        from hitchselenium import Director, ReadableSelectorTranslator
+
+        translator = ReadableSelectorTranslator(override_selectors="selectors.yaml")
+        director = Director(driver, translator)
+        director.visit("http://localhost:8000")
+        director.the("first name").fill_text("Mr")
+        director.the("last name").fill_text("Robot")
+        director.the("submit").click()
+        director.the("success message").should_appear()
+        director.url.should_contain("Robot")
+  tags:
+    - selector
+    - fill-form

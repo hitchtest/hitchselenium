@@ -13,12 +13,12 @@
     - Example code: |
         from hitchselenium import Director, ReadableSelectorTranslator
 
-        director = Director(driver)
         translator = ReadableSelectorTranslator(override_selectors="selectors.yaml")
+        director = Director(driver, translator)
 
         director.visit("http://localhost:8000")
-        director.click(translator("press this button"))
-        director.appear(translator("success message"))
+        director.the("press this button").click()
+        director.the("success message").should_appear()
   tags:
     - selector
     - click

@@ -13,10 +13,10 @@
     - Example code: |
         from hitchselenium import Director, ReadableSelectorTranslator
 
-        director = Director(driver)
         translator = ReadableSelectorTranslator(override_selectors="selectors.yaml")
+        director = Director(driver, translator)
 
         director.visit("http://localhost:8000")
     - Assert Exception:
-        command: director.click(translator("press this button"))
+        command: director.the("press this button").click()
         exception: 2 elements were found matching CSS selector '.press-this-button'

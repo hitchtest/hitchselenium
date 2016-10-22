@@ -8,3 +8,7 @@ class SingleElementSelectorMatchedMoreElements(HitchSeleniumException):
 
 class SingleElementSelectorMatchedNoElements(HitchSeleniumException):
     pass
+
+
+class ShouldHaveButDidNot(HitchSeleniumException):
+    pass

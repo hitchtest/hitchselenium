@@ -13,10 +13,10 @@
     - Example code: |
         from hitchselenium import Director, ReadableSelectorTranslator
 
-        director = Director(driver)
         translator = ReadableSelectorTranslator(override_selectors="selectors.yaml")
+        director = Director(driver, translator)
 
         director.visit("http://localhost:8000")
     - Assert Exception:
-        command: director.click(translator("nonexistent item"))
+        command: director.the("nonexistent item").click()
         exception: No element found matching CSS selector '.nonexistent-item'
