@@ -1,14 +1,14 @@
-- name : Attempt to click links matched by same selector
+- name : Click link with xpath selector
   description: |
-    Attempting to use a CSS selector that matches multiple
-    objects should fail.
+    Using the xpath selector, click on a link.
   preconditions:
     html: |
       <a class="press-this-button" href="/failure.html">Don't press this button</a>
       <a class="press-this-button" href="/success.html">Press this button</a>
     driver: yes
     selectors: |
-      press this button: .press-this-button
+      press this button:
+        xpath: //a[@class='press-this-button'][2]
   scenario:
     - Example code: |
         from hitchselenium import Director, ReadableSelectorTranslator
@@ -17,6 +17,8 @@
         translator = ReadableSelectorTranslator(override_selectors="selectors.yaml")
 
         director.visit("http://localhost:8000")
-    - Assert Exception:
-        command: director.click(translator("press this button"))
-        exception: 2 elements were found matching CSS selector '.press-this-button'
+        director.click(translator("press this button"))
+        director.appear(translator("success message"))
+  tags:
+    - selector
+    - click
