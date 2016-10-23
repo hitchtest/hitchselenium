@@ -7,8 +7,9 @@ from selenium.common.exceptions import StaleElementReferenceException
 
 
 class text_to_be_equal_in_element_contents_or_value(object):
-    """ An expectation for checking if the given text is present and equal in the
-    specified element.
+    """
+    An expectation for checking if the given text is equal in the
+    specified element or its value attribute.
     """
     def __init__(self, locator, text_):
         self.locator = locator
@@ -28,7 +29,7 @@ class text_to_be_equal_in_element_contents_or_value(object):
 class text_to_be_present_in_element_contents_or_value(object):
     """
     An expectation for checking if the given text is present in the element's
-    locator, text
+    text or its value attribute.
     """
     def __init__(self, locator, text_):
         self.locator = locator
@@ -84,7 +85,7 @@ class IndividualElement(object):
 
     def should_appear(self):
         """
-        Check that element is visible.
+        Wait for element to appear; throw exception if it does not.
         """
         WebDriverWait(self.director.driver, self.director.default_timeout).until(
             expected_conditions.visibility_of_element_located(
@@ -94,7 +95,10 @@ class IndividualElement(object):
 
     def should_contain(self, text):
         """
-        Check that text appears in element.
+        Wait for element to contain text somewhere in it; throw exception if it does not.
+
+        Checks contents of tags (e.g. <span>contents</span>) and elements
+        with values (e.g. <input name="textbox" value="contents" />).
         """
         WebDriverWait(self.director.driver, self.director.default_timeout).until(
             text_to_be_present_in_element_contents_or_value(
@@ -104,7 +108,10 @@ class IndividualElement(object):
 
     def should_only_contain(self, text):
         """
-        Check that text appears in element.
+        Wait for element to contain exact text; throw exception if it does not.
+
+        Checks contents of tags (e.g. <span>contents</span>) and elements
+        with values (e.g. <input name="textbox" value="contents" />).
         """
         WebDriverWait(self.director.driver, self.director.default_timeout).until(
             text_to_be_equal_in_element_contents_or_value(
