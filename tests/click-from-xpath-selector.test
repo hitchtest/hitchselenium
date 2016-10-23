@@ -22,6 +22,9 @@
         director.the("press this button").click()
         director.the("success message").should_appear()
         director.the("success message").should_contain("Success")
+        director.the("empty message").should_only_contain("")
+    - Assert True: |
+        director.the("success message").contents() == "Success!"
   tags:
     - selector
     - click

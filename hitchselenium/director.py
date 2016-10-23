@@ -3,6 +3,25 @@ from selenium.webdriver.support.ui import WebDriverWait
 from hitchselenium import exceptions
 import time
 
+from selenium.common.exceptions import StaleElementReferenceException
+
+
+class text_to_be_equal_in_element(object):
+    """ An expectation for checking if the given text is present and equal in the
+    specified element.
+    """
+    def __init__(self, locator, text_):
+        self.locator = locator
+        self.text = text_
+
+    def __call__(self, driver):
+        try:
+            element_text = expected_conditions._find_element(driver, self.locator).text
+            return self.text == element_text
+        except StaleElementReferenceException:
+            return False
+
+
 
 class IndividualElement(object):
     def __init__(self, director, selector):
@@ -59,6 +78,22 @@ class IndividualElement(object):
                 self.selector.conditions(), text
             )
         )
+
+    def should_only_contain(self, text):
+        """
+        Check that text appears in element.
+        """
+        WebDriverWait(self.director.driver, self.director.default_timeout).until(
+            text_to_be_equal_in_element(
+                self.selector.conditions(), text
+            )
+        )
+
+    def contents(self):
+        """
+        Get text contents of any label.
+        """
+        return self.selector.find_element(self.director.driver).text
 
 
 

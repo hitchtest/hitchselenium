@@ -17,5 +17,6 @@ success_html: |
   </head>
   <body>
   <h1 id="success-message">Success!</h1>
+  <h1 id="empty-message"></h1>
   </body>
   </html>
