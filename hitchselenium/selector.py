@@ -53,7 +53,7 @@ class XPathSelector(object):
             return results[0]
 
     def conditions(self):
-        return (By.XPATH_SELECTOR, self._code)
+        return (By.XPATH, self._code)
 
 
 class ReadableSelectorTranslator(object):

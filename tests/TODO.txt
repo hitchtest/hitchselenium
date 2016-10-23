@@ -1,6 +1,5 @@
 * Browser back/forward button
 * Hit key
-* Drop downs
 * Screenshots
 * Check appears
 * Get value
@@ -8,4 +7,4 @@
 * Check element contains (= wait)
 * Check URL path is (= wait)
 * Check page title is (= wait)
-* Page source 
+* Page source

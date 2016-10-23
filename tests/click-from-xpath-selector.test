@@ -9,6 +9,8 @@
     selectors: |
       press this button:
         xpath: //a[@class='press-this-button'][2]
+      success message:
+        xpath: //h1[@id='success-message'][1]
   scenario:
     - Example code: |
         from hitchselenium import Director, ReadableSelectorTranslator
