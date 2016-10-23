@@ -20,23 +20,43 @@ class IndividualElementDirector(object):
     def fill_text(self, text):
         """
         Fill text in a text box.
+
+        Clears the text box of text first.
         """
         self.selector.find_element(self.director.driver).clear()
         self.selector.find_element(self.director.driver).send_keys(text)
 
     def send_keys(self, text):
         """
-        Fill text in a text box.
+        Send specified keys to an element (dropdown, text box, etc.).
+
+        Unlike fill_text, this method does not attempt to clear the element (i.e. text box) first.
         """
         self.selector.find_element(self.director.driver).send_keys(text)
 
     def click(self):
+        """
+        Click on element.
+        """
         self.selector.find_element(self.director.driver).click()
 
     def should_appear(self):
+        """
+        Check that element is visible.
+        """
         WebDriverWait(self.director.driver, self.director.default_timeout).until(
             expected_conditions.visibility_of_element_located(
                 self.selector.conditions()
+            )
+        )
+
+    def should_contain(self, text):
+        """
+        Check that text appears in element.
+        """
+        WebDriverWait(self.director.driver, self.director.default_timeout).until(
+            expected_conditions.text_to_be_present_in_element(
+                self.selector.conditions(), text
             )
         )
 

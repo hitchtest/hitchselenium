@@ -21,6 +21,7 @@
         director.visit("http://localhost:8000")
         director.the("press this button").click()
         director.the("success message").should_appear()
+        director.the("success message").should_contain("Success")
   tags:
     - selector
     - click
