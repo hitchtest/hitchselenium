@@ -4,7 +4,7 @@ from hitchselenium import exceptions
 import time
 
 
-class IndividualElementDirector(object):
+class IndividualElement(object):
     def __init__(self, director, selector):
         self._director = director
         self._selector = selector
@@ -100,16 +100,6 @@ class Director(object):
     def driver(self):
         return self._driver
 
-    def click(self, selector):
-        selector.find_element(self.driver).click()
-
-    def appear(self, selector):
-        WebDriverWait(self.driver, self._timeout).until(
-            expected_conditions.visibility_of_element_located(
-                selector.conditions()
-            )
-        )
-
     def visit(self, url):
         """
         Load URL.
@@ -121,4 +111,4 @@ class Director(object):
         return PageUrl(self)
 
     def the(self, identifier):
-        return IndividualElementDirector(self, self._selector_translator(identifier))
+        return IndividualElement(self, self._selector_translator(identifier))
