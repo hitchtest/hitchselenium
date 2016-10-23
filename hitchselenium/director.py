@@ -6,7 +6,7 @@ import time
 from selenium.common.exceptions import StaleElementReferenceException
 
 
-class text_to_be_equal_in_element(object):
+class text_to_be_equal_in_element_contents_or_value(object):
     """ An expectation for checking if the given text is present and equal in the
     specified element.
     """
@@ -16,10 +16,33 @@ class text_to_be_equal_in_element(object):
 
     def __call__(self, driver):
         try:
-            element_text = expected_conditions._find_element(driver, self.locator).text
-            return self.text == element_text
+            element = expected_conditions._find_element(driver, self.locator)
+            #if element_text:
+            return self.text == element.text or self.text == element.get_attribute("value")
+            #else:
+                #return False
         except StaleElementReferenceException:
             return False
+
+
+class text_to_be_present_in_element_contents_or_value(object):
+    """
+    An expectation for checking if the given text is present in the element's
+    locator, text
+    """
+    def __init__(self, locator, text_):
+        self.locator = locator
+        self.text = text_
+
+    def __call__(self, driver):
+        try:
+            element = expected_conditions._find_element(driver, self.locator)
+            #if element_text:
+            return self.text in element.text or self.text in element.get_attribute("value")
+            #else:
+                #return False
+        except StaleElementReferenceException:
+                return False
 
 
 
@@ -74,7 +97,7 @@ class IndividualElement(object):
         Check that text appears in element.
         """
         WebDriverWait(self.director.driver, self.director.default_timeout).until(
-            expected_conditions.text_to_be_present_in_element(
+            text_to_be_present_in_element_contents_or_value(
                 self.selector.conditions(), text
             )
         )
@@ -84,7 +107,7 @@ class IndividualElement(object):
         Check that text appears in element.
         """
         WebDriverWait(self.director.driver, self.director.default_timeout).until(
-            text_to_be_equal_in_element(
+            text_to_be_equal_in_element_contents_or_value(
                 self.selector.conditions(), text
             )
         )

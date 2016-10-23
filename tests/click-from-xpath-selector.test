@@ -23,6 +23,7 @@
         director.the("success message").should_appear()
         director.the("success message").should_contain("Success")
         director.the("empty message").should_only_contain("")
+        director.the("textbox").should_contain("Contents")
     - Assert True: |
         director.the("success message").contents() == "Success!"
   tags:
