@@ -18,6 +18,8 @@ success_html: |
   <body>
   <h1 id="success-message">Success!</h1>
   <h1 id="empty-message"></h1>
+  <h1 id="message-containing-code">The code is 1792</h1>
+  <h1 id="message-containing-only-code">1792</h1>
 
   <input id="textbox" value="Contents" />
   </body>

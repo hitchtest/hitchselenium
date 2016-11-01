@@ -1,49 +1,58 @@
 from selenium.webdriver.support import expected_conditions
 from selenium.webdriver.support.ui import WebDriverWait
+from selenium.common import exceptions
 from hitchselenium import exceptions
 import time
+import re
 
-from selenium.common.exceptions import StaleElementReferenceException
+
+class Expectation(object):
+    def __init__(self, locator, text_):
+        self.locator = locator
+        self.text = text_
+
+    def __call__(self, driver):
+        try:
+            element = expected_conditions._find_element(driver, self.locator)
+            return self.check(element)
+        except exceptions.StaleElementReferenceException:
+            return False
 
 
-class text_to_be_equal_in_element_contents_or_value(object):
+class text_to_be_equal_in_element_contents_or_value(Expectation):
     """
     An expectation for checking if the given text is equal in the
     specified element or its value attribute.
     """
-    def __init__(self, locator, text_):
-        self.locator = locator
-        self.text = text_
-
-    def __call__(self, driver):
-        try:
-            element = expected_conditions._find_element(driver, self.locator)
-            #if element_text:
-            return self.text == element.text or self.text == element.get_attribute("value")
-            #else:
-                #return False
-        except StaleElementReferenceException:
-            return False
+    def check(self, element):
+        return self.text == element.text or self.text == element.get_attribute("value")
 
 
-class text_to_be_present_in_element_contents_or_value(object):
+class text_to_be_present_in_element_contents_or_value(Expectation):
     """
     An expectation for checking if the given text is present in the element's
     text or its value attribute.
     """
-    def __init__(self, locator, text_):
-        self.locator = locator
-        self.text = text_
+    def check(self, element):
+        return self.text in element.text or self.text in element.get_attribute("value")
 
-    def __call__(self, driver):
-        try:
-            element = expected_conditions._find_element(driver, self.locator)
-            #if element_text:
-            return self.text in element.text or self.text in element.get_attribute("value")
-            #else:
-                #return False
-        except StaleElementReferenceException:
-                return False
+
+class regex_to_be_present_in_element_contents_or_value(Expectation):
+    """
+    An expectation for checking if the given regex is found in the element's
+    text or its value attribute.
+    """
+    def check(self, element):
+        return self.text.search(element.text) is not None or self.text.search(element.get_attribute("value")) is not None
+
+
+class regex_to_be_equal_in_element_contents_or_value(Expectation):
+    """
+    An expectation for checking if the given regex *matches* the element's
+    text or its value attribute.
+    """
+    def check(self, element):
+        return self.text.match(element.text) is not None or self.text.match(element.get_attribute("value")) is not None
 
 
 
@@ -99,12 +108,23 @@ class IndividualElement(object):
 
         Checks contents of tags (e.g. <span>contents</span>) and elements
         with values (e.g. <input name="textbox" value="contents" />).
+
+        text can be a string or a python regular expression object.
         """
-        WebDriverWait(self.director.driver, self.director.default_timeout).until(
-            text_to_be_present_in_element_contents_or_value(
-                self.selector.conditions(), text
+        assert type(text) is str or type(text) is type(re.compile(""))
+
+        if type(text) is str:
+            WebDriverWait(self.director.driver, self.director.default_timeout).until(
+                text_to_be_present_in_element_contents_or_value(
+                    self.selector.conditions(), text
+                )
             )
-        )
+        else:
+            WebDriverWait(self.director.driver, self.director.default_timeout).until(
+                regex_to_be_present_in_element_contents_or_value(
+                    self.selector.conditions(), text
+                )
+            )
 
     def should_only_contain(self, text):
         """
@@ -113,11 +133,18 @@ class IndividualElement(object):
         Checks contents of tags (e.g. <span>contents</span>) and elements
         with values (e.g. <input name="textbox" value="contents" />).
         """
-        WebDriverWait(self.director.driver, self.director.default_timeout).until(
-            text_to_be_equal_in_element_contents_or_value(
-                self.selector.conditions(), text
+        if type(text) is str:
+            WebDriverWait(self.director.driver, self.director.default_timeout).until(
+                text_to_be_equal_in_element_contents_or_value(
+                    self.selector.conditions(), text
+                )
             )
-        )
+        else:
+            WebDriverWait(self.director.driver, self.director.default_timeout).until(
+                regex_to_be_equal_in_element_contents_or_value(
+                    self.selector.conditions(), text
+                )
+            )
 
     def contents(self):
         """

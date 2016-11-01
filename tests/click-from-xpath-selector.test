@@ -14,6 +14,7 @@
   scenario:
     - Example code: |
         from hitchselenium import Director, ReadableSelectorTranslator
+        import re
 
         translator = ReadableSelectorTranslator(override_selectors="selectors.yaml")
         director = Director(driver, translator)
@@ -23,6 +24,9 @@
         director.the("success message").should_appear()
         director.the("success message").should_contain("Success")
         director.the("empty message").should_only_contain("")
+        director.the("message containing code").should_contain(re.compile(r'[0-9][0-9][0-9][0-9]'))
+        director.the("message containing only code").should_only_contain(re.compile(r'[0-9][0-9][0-9][0-9]'))
+
         director.the("textbox").should_contain("Contents")
     - Assert True: |
         director.the("success message").contents() == "Success!"
