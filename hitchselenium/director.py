@@ -185,11 +185,15 @@ class Director(object):
         self._driver = driver
         self._selector_translator = selector_translator
         self._default_timeout = default_timeout
-        self._screenshot_directory = Path(screenshot_directory)
-        self._screenshot_fix_directory = Path(screenshot_fix_directory)
+        self._screenshot_directory = None
+        self._screenshot_fix_directory = None
 
-        assert self._screenshot_directory.exists()
-        assert self._screenshot_fix_directory.exists()
+        if self._screenshot_directory is not None:
+            self._screenshot_directory = Path(screenshot_directory)
+            assert self._screenshot_directory.exists()
+        if self._screenshot_fix_directory is not None:
+            self._screenshot_fix_directory = Path(screenshot_fix_directory)
+            assert self._screenshot_fix_directory.exists()
 
 
     @property
@@ -215,6 +219,8 @@ class Director(object):
         """
         Verify that a page's screenshot has not changed.
         """
+        assert self._screenshot_fix_directory is not None
+        assert self._screenshot_directory is not None
         filename = "{}.png".format(name).replace(" ", "-")
         fixfile = self._screenshot_fix_directory.joinpath(filename)
         artefactfile = self._screenshot_directory.joinpath(filename)
