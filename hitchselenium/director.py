@@ -188,10 +188,10 @@ class Director(object):
         self._screenshot_directory = None
         self._screenshot_fix_directory = None
 
-        if self._screenshot_directory is not None:
+        if screenshot_directory is not None:
             self._screenshot_directory = Path(screenshot_directory)
             assert self._screenshot_directory.exists()
-        if self._screenshot_fix_directory is not None:
+        if screenshot_fix_directory is not None:
             self._screenshot_fix_directory = Path(screenshot_fix_directory)
             assert self._screenshot_fix_directory.exists()
 
@@ -229,12 +229,15 @@ class Director(object):
         if not fixfile.exists():
             artefactfile.copy(fixfile)
         else:
-            if not utils.similar_images(artefactfile, fixfile, 0.98):
+            if not utils.similar_images(artefactfile, fixfile, 0.02):
                 raise exceptions.PageScreenshotDifferent(
                     artefactfile,
                     fixfile,
                     0.98
                 )
+
+    def page_contains_html(self, html):
+        assert False is True
 
     def the(self, identifier):
         return IndividualElement(self, self._selector_translator(identifier))

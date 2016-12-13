@@ -1,0 +1,26 @@
+- name : Look for HTML
+  description: |
+    Look for explicit HTML tags and fail if they do not exist.
+
+    When the page_source is gotten from selenium, it is generated from the DOM so the HTML
+    will need to be parsed and compared because the order of the HTML.
+  preconditions:
+    html: |
+      <a class="press-this-button" href="/failure.html" othertag=x anothertag=1>Don't press this button</a>
+      <a class="press-this-button" href="/success.html" othertag=x anothertag=1>Press this button</a>
+    driver: yes
+    selectors: |
+      press this button: .press-this-button:last-of-type
+  scenario:
+    - Example code: |
+        from hitchselenium import Director, ReadableSelectorTranslator
+        from path import Path
+
+        translator = ReadableSelectorTranslator(override_selectors="selectors.yaml")
+
+        director = Director(driver, translator)
+
+        assert director.page_contains_html("""<a class="press-this-button" othertag=x anothertag=1 href="/success.html">Press this button</a>""")
+  tags:
+    - selector
+    - click
