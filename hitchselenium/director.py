@@ -2,6 +2,8 @@ from selenium.webdriver.support import expected_conditions
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.common import exceptions
 from hitchselenium import exceptions
+from hitchselenium import utils
+from path import Path
 import time
 import re
 
@@ -179,10 +181,16 @@ class PageUrl(object):
 
 
 class Director(object):
-    def __init__(self, driver, selector_translator, default_timeout=5):
+    def __init__(self, driver, selector_translator, default_timeout=5, screenshot_directory=None, screenshot_fix_directory=None):
         self._driver = driver
         self._selector_translator = selector_translator
         self._default_timeout = default_timeout
+        self._screenshot_directory = Path(screenshot_directory)
+        self._screenshot_fix_directory = Path(screenshot_fix_directory)
+
+        assert self._screenshot_directory.exists()
+        assert self._screenshot_fix_directory.exists()
+
 
     @property
     def default_timeout(self):
@@ -201,6 +209,26 @@ class Director(object):
     @property
     def url(self):
         return PageUrl(self)
+
+
+    def verify_page(self, name):
+        """
+        Verify that a page's screenshot has not changed.
+        """
+        filename = "{}.png".format(name).replace(" ", "-")
+        fixfile = self._screenshot_fix_directory.joinpath(filename)
+        artefactfile = self._screenshot_directory.joinpath(filename)
+        self.driver.save_screenshot(artefactfile)
+
+        if not fixfile.exists():
+            artefactfile.copy(fixfile)
+        else:
+            if not utils.similar_images(artefactfile, fixfile, 0.98):
+                raise exceptions.PageScreenshotDifferent(
+                    artefactfile,
+                    fixfile,
+                    0.98
+                )
 
     def the(self, identifier):
         return IndividualElement(self, self._selector_translator(identifier))

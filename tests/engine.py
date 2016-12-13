@@ -1,4 +1,6 @@
 from commandlib import run
+from os import path
+from subprocess import call
 import hitchselenium
 import hitchpython
 import hitchserve
@@ -153,16 +155,14 @@ class ExecutionEngine(hitchtest.ExecutionEngine):
     def shell(self):
         if hasattr(self, 'services'):
             self.services.start_interactive_mode()
+            time.sleep(0.5)
             import sys
-            import time ; time.sleep(0.5)
-            from os import path
-            from subprocess import call
             if path.exists(path.join(
                 path.expanduser("~"), ".ipython/profile_default/security/",
                 self.ipython_kernel_filename)
             ):
                 call([
-                        sys.executable, "-m", "IPython", "console",
+                        sys.executable, "-m", "jupyter_console",
                         "--existing",
                         path.join(
                             path.expanduser("~"),
@@ -172,10 +172,11 @@ class ExecutionEngine(hitchtest.ExecutionEngine):
                     ])
             else:
                 call([
-                    sys.executable, "-m", "IPython", "console",
+                    sys.executable, "-m", "jupyter_console",
                     "--existing", self.ipython_kernel_filename
                 ])
             self.services.stop_interactive_mode()
+
 
     def on_failure(self):
         """Stop and IPython."""

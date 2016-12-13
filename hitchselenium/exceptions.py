@@ -12,3 +12,7 @@ class SingleElementSelectorMatchedNoElements(HitchSeleniumException):
 
 class ShouldHaveButDidNot(HitchSeleniumException):
     pass
+
+
+class PageScreenshotDifferent(HitchSeleniumException):
+    pass
