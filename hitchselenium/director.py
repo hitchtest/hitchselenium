@@ -1,6 +1,6 @@
 from selenium.webdriver.support import expected_conditions
 from selenium.webdriver.support.ui import WebDriverWait
-from selenium.common import exceptions
+from selenium.common.exceptions import StaleElementReferenceException
 from hitchselenium import exceptions
 from hitchselenium import utils
 from path import Path
@@ -17,7 +17,7 @@ class Expectation(object):
         try:
             element = expected_conditions._find_element(driver, self.locator)
             return self.check(element)
-        except exceptions.StaleElementReferenceException:
+        except StaleElementReferenceException:
             return False
 
 
@@ -45,7 +45,8 @@ class regex_to_be_present_in_element_contents_or_value(Expectation):
     text or its value attribute.
     """
     def check(self, element):
-        return self.text.search(element.text) is not None or self.text.search(element.get_attribute("value")) is not None
+        return self.text.search(element.text) is not None or \
+            self.text.search(element.get_attribute("value")) is not None
 
 
 class regex_to_be_equal_in_element_contents_or_value(Expectation):
@@ -54,8 +55,8 @@ class regex_to_be_equal_in_element_contents_or_value(Expectation):
     text or its value attribute.
     """
     def check(self, element):
-        return self.text.match(element.text) is not None or self.text.match(element.get_attribute("value")) is not None
-
+        return self.text.match(element.text) is not None or \
+            self.text.match(element.get_attribute("value")) is not None
 
 
 class IndividualElement(object):
@@ -113,7 +114,7 @@ class IndividualElement(object):
 
         text can be a string or a python regular expression object.
         """
-        assert type(text) is str or type(text) is type(re.compile(""))
+        assert isinstance(text, str) or isinstance(text, type(re.compile("")))
 
         if type(text) is str:
             WebDriverWait(self.director.driver, self.director.default_timeout).until(
@@ -155,11 +156,9 @@ class IndividualElement(object):
         return self.selector.find_element(self.director.driver).text
 
 
-
 class PageUrl(object):
     def __init__(self, director):
         self._director = director
-
 
     def should_contain(self, text):
         wait_for = self._director.default_timeout
@@ -181,7 +180,14 @@ class PageUrl(object):
 
 
 class Director(object):
-    def __init__(self, driver, selector_translator, default_timeout=5, screenshot_directory=None, screenshot_fix_directory=None):
+    def __init__(
+        self,
+        driver,
+        selector_translator,
+        default_timeout=5,
+        screenshot_directory=None,
+        screenshot_fix_directory=None
+    ):
         self._driver = driver
         self._selector_translator = selector_translator
         self._default_timeout = default_timeout
@@ -194,7 +200,6 @@ class Director(object):
         if screenshot_fix_directory is not None:
             self._screenshot_fix_directory = Path(screenshot_fix_directory)
             assert self._screenshot_fix_directory.exists()
-
 
     @property
     def default_timeout(self):
@@ -213,7 +218,6 @@ class Director(object):
     @property
     def url(self):
         return PageUrl(self)
-
 
     def verify_page(self, name):
         """
@@ -236,8 +240,8 @@ class Director(object):
                     0.98
                 )
 
-    def page_contains_html(self, html):
-        assert False is True
+    def page_contains_html(self, html_snippet):
+        return utils.check_page_contains_html(self.driver.page_source, html_snippet)
 
     def the(self, identifier):
         return IndividualElement(self, self._selector_translator(identifier))

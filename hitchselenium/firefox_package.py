@@ -1,10 +1,9 @@
 from hitchtest import HitchPackage, utils
 from hitchtest.executionengine import Paths
-from hitchtest.environment import checks
-from subprocess import check_output, call, check_call
+from subprocess import check_output, check_call
 from os.path import join, exists
-from os import makedirs, chdir, environ
-import hitchselenium
+from os import makedirs
+from hitchselenium import exceptions
 import shutil
 import struct
 import sys
@@ -13,6 +12,7 @@ import sys
 ISSUES_URL = "http://github.com/hitchtest/hitchselenium/issues"
 
 RELEASE_URL_BASE = "https://download-installer.cdn.mozilla.net/pub/firefox/releases/"
+
 
 class FirefoxPackage(HitchPackage):
     VERSIONS = [
@@ -26,40 +26,65 @@ class FirefoxPackage(HitchPackage):
         self.version = self.check_version(version, self.VERSIONS, ISSUES_URL)
         if paths is None:
             paths = Paths()
-            self._firefox_path = join(self.get_downloads_directory(), "firefox-{}".format(version))
+            self._firefox_path = join(
+                self.get_downloads_directory(),
+                "firefox-{}".format(version)
+            )
         else:
             self._firefox_path = paths.hitchpkg.joinpath(
-                package.format(version=self.version)
+                "firefox-{0}".format(version=self.version)
             ).abspath()
 
         self.directory = self._firefox_path
         self.tmp_directory = '/tmp/firefoxmount'
 
-
     def verify(self):
         version_output = check_output([self.firefox, "--version"]).decode('utf8')
         if self.version not in version_output:
-            raise RuntimeError("Firefox version needed is {}, output is: {}.".format(self.version, version_output))
+            raise exceptions.WrongFirefoxVersion(
+                "Firefox version needed is {0}, output is: {1}.".format(
+                    self.version, version_output
+                )
+            )
 
     def build(self):
         if sys.platform == "darwin":
-            download_to = join(self.get_downloads_directory(), "firefox-{}.dmg".format(self.version))
-            self.download_url = "{0}{1}/mac/en-US/Firefox%20{1}.dmg".format(RELEASE_URL_BASE, self.version)
+            download_to = join(
+                self.get_downloads_directory(),
+                "firefox-{}.dmg".format(self.version)
+            )
+            self.download_url = "{0}{1}/mac/en-US/Firefox%20{1}.dmg".format(
+                RELEASE_URL_BASE,
+                self.version
+            )
         else:
-            download_to = join(self.get_downloads_directory(), "firefox-{}.tar.gz".format(self.version))
+            download_to = join(
+                self.get_downloads_directory(),
+                "firefox-{}.tar.gz".format(self.version)
+            )
             systembits = struct.calcsize("P") * 8
 
             if systembits == 32:
-                self.download_url = "{0}{1}/linux-i686/en-US/firefox-{1}.tar.bz2".format(RELEASE_URL_BASE, self.version)
+                self.download_url = "{0}{1}/linux-i686/en-US/firefox-{1}.tar.bz2".format(
+                    RELEASE_URL_BASE, self.version
+                )
             else:
-                self.download_url = "{0}{1}/linux-x86_64/en-US/firefox-{1}.tar.bz2".format(RELEASE_URL_BASE, self.version)
+                self.download_url = "{0}{1}/linux-x86_64/en-US/firefox-{1}.tar.bz2".format(
+                    RELEASE_URL_BASE, self.version
+                )
         utils.download_file(download_to, self.download_url)
 
         if sys.platform == "darwin":
             if not exists(self.directory):
-                check_call(["hdiutil", "attach", "-nobrowse", "-mountpoint", self.tmp_directory, download_to])
+                check_call([
+                    "hdiutil", "attach", "-nobrowse", "-mountpoint",
+                    self.tmp_directory, download_to
+                ])
                 makedirs(join(self.directory, "Firefox.app"))
-                shutil.copytree(join(self.tmp_directory, "Firefox.app", "Contents"), join(self.directory, "Firefox.app", "Contents"))
+                shutil.copytree(
+                    join(self.tmp_directory, "Firefox.app", "Contents"),
+                    join(self.directory, "Firefox.app", "Contents")
+                )
                 check_call(["hdiutil", "detach", self.tmp_directory])
             self.bin_directory = join(self.directory, "Firefox.app", "Contents", "MacOS")
         else:

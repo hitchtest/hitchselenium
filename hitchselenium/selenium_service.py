@@ -7,7 +7,7 @@ import sys
 
 
 class SeleniumService(Service):
-    """Firefox with selenium as a service."""
+    """Firefox with selenium as a service. (DEPRECATED)"""
 
     def __init__(self, xvfb=False, shunt_window=True, implicitly_wait=5.0, firefox_binary="firefox", **kwargs):
         """Initialize selenium Service object (but don't run).
@@ -19,6 +19,8 @@ class SeleniumService(Service):
         """
 
         checks.packages(hitchselenium.UNIXPACKAGES)
+
+        sys.stderr.write("SeleniumService is now deprecated. Replace with FirefoxService")
 
         if xvfb:
             if sys.platform == "darwin":

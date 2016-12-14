@@ -9,13 +9,24 @@ import sys
 class FirefoxService(Service):
     """Firefox with selenium as a service."""
 
-    def __init__(self, firefox_binary, xvfb=False, shunt_window=True, implicitly_wait=5.0, preferences=None, **kwargs):
+    def __init__(
+        self,
+        firefox_binary,
+        xvfb=False,
+        shunt_window=True,
+        implicitly_wait=5.0,
+        preferences=None,
+        **kwargs
+    ):
         """Initialize selenium Service object (but don't run).
 
         Args:
-            xvfb (Optional[bool]): Run service with X virtual framebuffer (don't show firefox window).
-            shunt_window (Optional[bool]): Shunt window to (0, 0) coordinates to move out of the way of the mouse.
-            implicitly_wait (Optional[float]): Set implicitly_wait value of the selenium driver. Default: 5.0 seconds.
+            xvfb (Optional[bool]): Run service with X virtual framebuffer
+                (don't show firefox window).
+            shunt_window (Optional[bool]): Shunt window to (0, 0) coordinates
+                (move out of the way of the mouse)
+            implicitly_wait (Optional[float]): Set implicitly_wait value of the selenium driver.
+                (Default: 5.0 seconds.)
         """
 
         checks.packages(hitchselenium.UNIXPACKAGES)
@@ -49,7 +60,10 @@ class FirefoxService(Service):
         if self._driver is not None:
             return self._driver
         else:
-            self._driver = webdriver.Remote(command_executor=self.logs.json()[0]['uri'], desired_capabilities={})
+            self._driver = webdriver.Remote(
+                command_executor=self.logs.json()[0]['uri'],
+                desired_capabilities={}
+            )
             self._driver.implicitly_wait(5.0)
             self._driver.accept_next_alert = True
             return self._driver

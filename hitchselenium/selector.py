@@ -29,7 +29,6 @@ class CSSSelector(object):
         return (By.CSS_SELECTOR, self._code)
 
 
-
 class XPathSelector(object):
     def __init__(self, code):
         self._code = code

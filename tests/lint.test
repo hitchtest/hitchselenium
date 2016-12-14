@@ -1,0 +1,10 @@
+- name: Run flake8
+  tags:
+    - flake8
+  scenario:
+    #- Pause
+    - Flake8:
+        directory: hitchselenium
+        args:
+          - --max-line-length=100
+          - --exclude=__init__.py,selenium_service.py,step_library.py

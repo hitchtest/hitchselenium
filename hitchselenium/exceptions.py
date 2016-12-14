@@ -16,3 +16,7 @@ class ShouldHaveButDidNot(HitchSeleniumException):
 
 class PageScreenshotDifferent(HitchSeleniumException):
     pass
+
+
+class WrongFirefoxVersion(HitchSeleniumException):
+    pass
