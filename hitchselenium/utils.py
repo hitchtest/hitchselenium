@@ -8,11 +8,10 @@ def similar_images(image1_filepath, image2_filepath, allowable_difference):
     """
     Compare histograms of two images.
     """
-    h1 = Image.open(image1_filepath).histogram()
-    h2 = Image.open(image2_filepath).histogram()
+    hist1 = Image.open(image1_filepath).histogram()
+    hist2 = Image.open(image2_filepath).histogram()
 
-    rms = math.sqrt(reduce(operator.add, map(lambda a, b: (a - b)**2, h1, h2)) / len(h1))
-    print(rms)
+    rms = math.sqrt(reduce(operator.add, map(lambda a, b: (a - b)**2, hist1, hist2)) / len(hist1))
     return rms < allowable_difference
 
 
@@ -30,15 +29,16 @@ def check_page_contains_html(page_source, html_snippet):
     """
     Check that parsed HTML text contains a parsed snippet of HTML.
     """
-    from lxml.html import fromstring
-    page_source = fromstring(page_source)
-    snippet_parsed = fromstring(html_snippet)
+    from lxml.html import fragments_fromstring, fromstring, tostring
+    page_source_tags = [x for x in fromstring(page_source).iter()]
+    snippet_parsed_tags = [x for x in fragments_fromstring(html_snippet)]
 
-    for page_source_tag in page_source.iter():
-        for snippet_tag in snippet_parsed.iter():
-            found = True
-            if not compare_tags(page_source_tag, snippet_tag):
-                found = False
-        if found:
-            return True
+    for index, tag in enumerate(page_source_tags):
+        if compare_tags(tag, snippet_parsed_tags[0]):
+            matching = True
+            for index2, potentially_matching_tag in enumerate(page_source_tags[index:index + len(snippet_parsed_tags)]):
+                potentially_subsequent_matching_tag = snippet_parsed_tags[index2]
+                if not compare_tags(potentially_subsequent_matching_tag, potentially_matching_tag):
+                    matching = False
+            return matching
     return False
