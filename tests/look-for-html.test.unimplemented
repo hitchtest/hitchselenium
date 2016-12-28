@@ -1,0 +1,42 @@
+- name : Look for HTML
+  description: |
+    Look for explicit HTML tags and fail if they do not exist.
+
+    When the page_source is gotten from selenium, it is generated from the DOM so the HTML
+    will need to be parsed and compared because the order of the HTML.
+  preconditions:
+    html: |
+      <a class="press-this-button" href="/failure.html" othertag=x anothertag=1>Don't press this button</a>
+      <a class="press-this-button" href="/success.html" othertag=x anothertag=1>Press this button</a>
+      <a class="press-this-button">Second button</a>
+
+      <div>
+        <p>Something I don't care about</p>
+        <p>Something I do care about being in a div.</p>
+        </p>Something else I don't care about.</p>
+      </div>
+    driver: yes
+    selectors: |
+      press this button: .press-this-button:last-of-type
+  scenario:
+    - Example code: |
+        from hitchselenium import Director, ReadableSelectorTranslator
+        from simex import DefaultSimex
+        from path import Path
+
+        translator = ReadableSelectorTranslator(override_selectors="selectors.yaml")
+
+        director = Director(driver, translator, simex=DefaultSimex(flexible_whitespace=True))
+        director.visit("http://localhost:8000")
+        assert director.page_contains_html("""<a class="press-this-button" othertag=x anothertag=1 href="/success.html">Press this button</a>  <a class="press-this-button">Second button</a>""")
+
+    - Example code: |
+        assert not director.page_contains_html("""<a class="press-this-button" othertag=x anothertag=1 href="/success.html">Press this button</a>  <a b="1" class="press-this-button">Second button</a>""")
+
+    - Example code: |
+        {% raw %}
+        assert director.page_contains_html("<div>{{ anything }}<p>Something I do care about being in a div.</p>{{ anything }}</div>")
+        {% endraw %}
+  tags:
+    - selector
+    - click

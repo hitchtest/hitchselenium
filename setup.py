@@ -41,7 +41,7 @@ setup(name="hitchselenium",
       install_requires=[
           'hitchserve', 'selenium<=2.53.6',
           'strictyaml', 'path.py', 'pillow',
-          'lxml', 'simex',
+          'lxml', 'simex>=0.3.4',
       ],
       packages=find_packages(exclude=[]),
       package_data={},

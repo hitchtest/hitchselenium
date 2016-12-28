@@ -3,6 +3,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.common.exceptions import StaleElementReferenceException
 from hitchselenium import exceptions
 from hitchselenium import utils
+from simex import DefaultSimex
 from path import Path
 import time
 import re
@@ -186,13 +187,15 @@ class Director(object):
         selector_translator,
         default_timeout=5,
         screenshot_directory=None,
-        screenshot_fix_directory=None
+        screenshot_fix_directory=None,
+        simex=None,
     ):
         self._driver = driver
         self._selector_translator = selector_translator
         self._default_timeout = default_timeout
         self._screenshot_directory = None
         self._screenshot_fix_directory = None
+        self._simex = simex if simex is not None else DefaultSimex(flexible_whitespace=True)
 
         if screenshot_directory is not None:
             self._screenshot_directory = Path(screenshot_directory)
@@ -241,7 +244,7 @@ class Director(object):
                 )
 
     def page_contains_html(self, html_snippet):
-        return utils.check_page_contains_html(self.driver.page_source, html_snippet)
+        return utils.check_page_contains_html(self.driver.page_source, html_snippet, self._simex)
 
     def the(self, identifier):
         return IndividualElement(self, self._selector_translator(identifier))
