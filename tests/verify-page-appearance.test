@@ -19,10 +19,12 @@
         
         screenshot_fix_directory = Path("fix")
         screenshot_directory = Path("artefact")
+        screenshot_diff_directory = Path("diff")
         screenshot_fix_directory.mkdir()
         screenshot_directory.mkdir()
-        
-        director = Director(driver, translator, screenshot_directory=screenshot_directory, screenshot_fix_directory=screenshot_fix_directory)
+        screenshot_diff_directory.mkdir()
+
+        director = Director(driver, translator, screenshot_directory=screenshot_directory, screenshot_fix_directory=screenshot_fix_directory, screenshot_diff_directory=screenshot_diff_directory)
 
         director.visit("http://localhost:8000")
         director.verify_page("page")

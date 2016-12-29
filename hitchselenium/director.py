@@ -3,6 +3,8 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.common.exceptions import StaleElementReferenceException
 from hitchselenium import exceptions
 from hitchselenium import utils
+from PIL import ImageChops
+from PIL import Image
 from simex import DefaultSimex
 from path import Path
 import time
@@ -188,6 +190,7 @@ class Director(object):
         default_timeout=5,
         screenshot_directory=None,
         screenshot_fix_directory=None,
+        screenshot_diff_directory=None,
         simex=None,
     ):
         self._driver = driver
@@ -195,6 +198,7 @@ class Director(object):
         self._default_timeout = default_timeout
         self._screenshot_directory = None
         self._screenshot_fix_directory = None
+        self._screenshot_diff_directory = None
         self._simex = simex if simex is not None else DefaultSimex(flexible_whitespace=True)
 
         if screenshot_directory is not None:
@@ -203,6 +207,9 @@ class Director(object):
         if screenshot_fix_directory is not None:
             self._screenshot_fix_directory = Path(screenshot_fix_directory)
             assert self._screenshot_fix_directory.exists()
+        if screenshot_diff_directory is not None:
+            self._screenshot_diff_directory = Path(screenshot_diff_directory)
+            assert self._screenshot_diff_directory.exists()
 
     @property
     def default_timeout(self):
@@ -222,25 +229,29 @@ class Director(object):
     def url(self):
         return PageUrl(self)
 
-    def verify_page(self, name):
+    def verify_page(self, name, score=10):
         """
         Verify that a page's screenshot has not changed.
         """
         assert self._screenshot_fix_directory is not None
         assert self._screenshot_directory is not None
+        assert self._screenshot_diff_directory is not None
         filename = "{}.png".format(name).replace(" ", "-")
         fixfile = self._screenshot_fix_directory.joinpath(filename)
         artefactfile = self._screenshot_directory.joinpath(filename)
+        difffile = self._screenshot_diff_directory.joinpath(filename)
         self.driver.save_screenshot(artefactfile)
 
         if not fixfile.exists():
             artefactfile.copy(fixfile)
         else:
-            if not utils.similar_images(artefactfile, fixfile, 0.02):
+            if utils.image_similarity_score(artefactfile, fixfile) > score:
+                ImageChops.multiply(Image.open(artefactfile), Image.open(fixfile)).save(difffile)
                 raise exceptions.PageScreenshotDifferent(
-                    artefactfile,
-                    fixfile,
-                    0.98
+                    artefactfile.abspath(),
+                    fixfile.abspath(),
+                    difffile.abspath(),
+                    utils.image_similarity_score(artefactfile, fixfile)
                 )
 
     def page_contains_html(self, html_snippet):

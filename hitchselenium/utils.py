@@ -4,15 +4,13 @@ import operator
 import math
 
 
-def similar_images(image1_filepath, image2_filepath, allowable_difference):
+def image_similarity_score(image1_filepath, image2_filepath):
     """
     Compare histograms of two images.
     """
     hist1 = Image.open(image1_filepath).histogram()
     hist2 = Image.open(image2_filepath).histogram()
-
-    rms = math.sqrt(reduce(operator.add, map(lambda a, b: (a - b)**2, hist1, hist2)) / len(hist1))
-    return rms < allowable_difference
+    return math.sqrt(reduce(operator.add, map(lambda a, b: (a - b)**2, hist1, hist2)) / len(hist1))
 
 
 #def compare_text(name1, name2, simex):
