@@ -203,13 +203,15 @@ class Director(object):
 
         if screenshot_directory is not None:
             self._screenshot_directory = Path(screenshot_directory)
-            assert self._screenshot_directory.exists()
+            if not self._screenshot_directory.exists():
+                self._screenshot_directory.mkdir()
+        if screenshot_diff_directory is not None:
+            self._screenshot_diff_directory = Path(screenshot_diff_directory)
+            if not self._screenshot_diff_directory.exists():
+                self._screenshot_diff_directory.mkdir()
         if screenshot_fix_directory is not None:
             self._screenshot_fix_directory = Path(screenshot_fix_directory)
             assert self._screenshot_fix_directory.exists()
-        if screenshot_diff_directory is not None:
-            self._screenshot_diff_directory = Path(screenshot_diff_directory)
-            assert self._screenshot_diff_directory.exists()
 
     @property
     def default_timeout(self):

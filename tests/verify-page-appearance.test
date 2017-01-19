@@ -1,8 +1,7 @@
-- name : Click link with standard selector
+- name : Screenshot comparison
   description: |
-    Using the default selector, which converts names with spaces into dashes,
-    (i.e. "do not press" -> "do-not-press"), the link element can be found and
-    clicked on.
+    Load page twice and compare two screenshots. Load another page and expect
+    verify page to fail.
   preconditions:
     html: |
       <a class="press-this-button" href="/failure.html">Don't press this button</a>
@@ -16,13 +15,11 @@
         from path import Path
 
         translator = ReadableSelectorTranslator(override_selectors="selectors.yaml")
-        
+
         screenshot_fix_directory = Path("fix")
         screenshot_directory = Path("artefact")
         screenshot_diff_directory = Path("diff")
         screenshot_fix_directory.mkdir()
-        screenshot_directory.mkdir()
-        screenshot_diff_directory.mkdir()
 
         director = Director(driver, translator, screenshot_directory=screenshot_directory, screenshot_fix_directory=screenshot_fix_directory, screenshot_diff_directory=screenshot_diff_directory)
 
