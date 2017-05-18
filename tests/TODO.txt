@@ -1,3 +1,17 @@
+/home/colm/lh/website/tests/.hitch/virtualenv/lib/python3.5/site-packages/hitchselenium/director.py in check(self, element)
+     40     """
+     41     def check(self, element):
+---> 42         return self.text in element.text or self.text in element.get_attribute("value")
+     43 
+     44 
+
+TypeError: argument of type 'NoneType' is not iterable
+
+
+* Screenshot director
+* Uploader director
+
+
 * Screenshot create necessary directories if they don't exist.
 * Screenshot diff add before on left and after on right.
 * Scroll into view
