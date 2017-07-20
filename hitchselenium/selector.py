@@ -65,7 +65,7 @@ class ReadableSelectorTranslator(object):
     def __call__(self, name):
         if self._override_selectors is not None:
             with open(self._override_selectors) as handle:
-                selectors = strictyaml.load(handle.read())
+                selectors = strictyaml.load(handle.read()).data
 
             if name in selectors.keys():
                 selector = selectors[name]
